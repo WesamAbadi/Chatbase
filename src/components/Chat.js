@@ -13,27 +13,44 @@ import "firebase/compat/firestore";
 import SendMessage from "./SendMessage";
 const db = getFirestore();
 function Chat() {
+  useEffect(() => {
+    startChat();
+  }, []);
   const [messages, setMessages] = useState([]);
+  const [arrays, setArray] = useState([]);
 
   function put(text) {
     setMessages(text);
   }
-  useEffect(() => {}, []);
-  getDocs(collection(db, "messages")).then((querySnapshot) => {
-    const newUserDataArray = querySnapshot.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-    }));
-    //newUserDataArray.forEach((element) => put(element.text));
-  });
-  //console.log(messages);
+
+  function startChat() {
+    getDocs(collection(db, "messages")).then((querySnapshot) => {
+      const newUserDataArray = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+      }));
+
+      newUserDataArray.map((msg) => {
+        setMessages(msg);
+        setArray(msg);
+      });
+      console.log(newUserDataArray);
+
+      //console.log(messages);
+      //setMessages(newUserDataArray.map((x)));
+      //newUserDataArray.forEach((element) => setMessages(element.text));
+    });
+  }
+
+  //  console.log(newUserDataArray);
+  console.log(messages);
+
   return (
-    <div>
+    <div className="mainChat">
       <SignOut />
 
-      {messages}
+      <div className="msg">{}</div>
 
-      <h5>chat js</h5>
+      <p>Your chat appears here ..</p>
       <SendMessage />
     </div>
   );
