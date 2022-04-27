@@ -7,6 +7,7 @@ import {
   getFirestore,
   onSnapshot,
   collection,
+  orderBy,
 } from "firebase/firestore";
 //import { getDatabase, ref, query, orderByChild } from "firebase/database";
 import "firebase/compat/firestore";
@@ -17,41 +18,59 @@ function Chat() {
     startChat();
   }, []);
   const [messages, setMessages] = useState([]);
-  const [arrays, setArray] = useState([]);
+  //const [arrays, setArray] = useState([]);
 
-  function put(text) {
+  /* function put(text) {
     setMessages(text);
-  }
+  } */
 
   function startChat() {
-    getDocs(collection(db, "messages")).then((querySnapshot) => {
-      const newUserDataArray = querySnapshot.docs.map((doc) => ({
-        ...doc.data(),
-      }));
+    getDocs(collection(db, "messages"), orderBy("createdAt")).then(
+      (querySnapshot) => {
+        setMessages(
+          querySnapshot.docs.map((doc) => ({
+            ...doc.data(),
+          }))
+        );
 
-      newUserDataArray.map((msg) => {
-        setMessages(msg);
-        setArray(msg);
-      });
-      console.log(newUserDataArray);
+        /*  newUserDataArray.map((msg) => {
+          setMessages((prevArray) => [...prevArray, msg]);
+          //setArray(msg);
+        }); */
 
-      //console.log(messages);
-      //setMessages(newUserDataArray.map((x)));
-      //newUserDataArray.forEach((element) => setMessages(element.text));
+        console.log(messages);
+        //setMessages(newUserDataArray.map((x)));
+        //newUserDataArray.forEach((element) => setMessages(element.text));
+      }
+    );
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      left: 0,
+      behavior: "smooth",
     });
   }
 
-  //  console.log(newUserDataArray);
   console.log(messages);
+  //  console.log(newUserDataArray);
 
   return (
     <div className="mainChat">
       <SignOut />
 
-      <div className="msg">{}</div>
+      <div className="msg">
+        {messages.map((mymm) => (
+          <div>
+            <img src={mymm.photoURL} alt="" />
+            <h3></h3>
+            <p>{mymm.text}</p>
+          </div>
+        ))}
+      </div>
 
-      <p>Your chat appears here ..</p>
-      <SendMessage />
+      {/* <p>Your chat appears here ..</p> */}
+      <div id="send">
+        <SendMessage />
+      </div>
     </div>
   );
 }

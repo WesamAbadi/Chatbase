@@ -9,9 +9,10 @@ import {
   serverTimestamp,
   addDoc,
   collection,
+  orderBy,
 } from "firebase/firestore";
 
-function SendMessage() {
+function SendMessage({ scroll }) {
   const [msg, setMsg] = useState("");
   async function sendMessage(e) {
     e.preventDefault();
@@ -29,7 +30,10 @@ function SendMessage() {
       text: msg,
       photoURL,
       uid,
+      createdAt: serverTimestamp(),
+      //Timestamp(date),
     });
+
     setMsg("");
   }
   return (
