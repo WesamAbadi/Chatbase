@@ -22,9 +22,11 @@ function SignIn() {
   };
 
   return (
-    <>
+    <div id="app">
+      <h3>Wellcome to Chatbase!</h3>
+      <h4>Sign In so you can chat .. </h4>
       <Button onClick={signInWithGoogle}>Sign in with google!</Button>
-    </>
+    </div>
   );
 }
 

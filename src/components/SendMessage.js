@@ -1,6 +1,6 @@
-import React, { useId, useState } from "react";
+import React, { useId, useState, useEffect } from "react";
 import { db, auth } from "../firebase";
-import { Button, Input } from "@material-ui/core";
+import { Button, Input, TextField } from "@material-ui/core";
 import { async } from "@firebase/util";
 import {
   doc,
@@ -12,11 +12,14 @@ import {
   orderBy,
 } from "firebase/firestore";
 
-function SendMessage({ scroll }) {
+function SendMessage() {
+  useEffect(() => {
+    hal();
+  }, []);
   const [msg, setMsg] = useState("");
   async function sendMessage(e) {
     e.preventDefault();
-    const { uid, photoURL } = auth.currentUser;
+    const { uid, photoURL, displayName } = auth.currentUser;
 
     /*  await setDoc(doc(db, "messages", "LA"), {
       text: msg,
@@ -30,17 +33,32 @@ function SendMessage({ scroll }) {
       text: msg,
       photoURL,
       uid,
+      displayName,
       createdAt: serverTimestamp(),
       //Timestamp(date),
     });
 
     setMsg("");
+
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      left: 0,
+      behavior: "smooth",
+    });
+  }
+  function hal() {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      left: 0,
+      behavior: "smooth",
+    });
   }
   return (
     <div>
       <form onSubmit={sendMessage}>
-        <Input
-          placeholder="Message..."
+        <TextField
+          variant="standard"
+          label="Message..."
           value={msg}
           onChange={(e) => setMsg(e.target.value)}
         />
