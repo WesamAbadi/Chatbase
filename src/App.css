@@ -1,46 +1,143 @@
-.mainChat{
-text-align: center;
-font-size: 50px;
-padding: 0;
-    margin: 0;
-font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+body {
+  background-color: black;
+  margin: 20px;
 }
-#app{
-    text-align: center;
-    padding: 0;
-    margin: 0;
+.mainChat {
+  text-align: center;
+  font-size: 50px;
+  padding: 0;
+  margin: 0;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
-.mainChat img{
-    height: 100px;
-    width: 100px;
-    margin: 10px;
-    background-color: black;
-    
-    border-radius: .5rem;
+#app {
+  text-align: center;
+  padding: 0;
+  margin: 0;
+}
+.mainChat img {
+  height: 100px;
+  width: 100px;
+  margin: 10px;
+
+  border-radius: 0.5rem;
 }
 
-#send{
-    height:10vh;
-    text-align: center;
-    background-color: aliceblue;
-    position:sticky;
-    bottom: 0%;
-    border-radius: .5rem;
+#send {
+  height: 10vh;
+  text-align: center;
+  background-color: aliceblue;
+  position: sticky;
+  bottom: 1%;
+  border-radius: 0.5rem;
 }
-.msg{
-    
-    background-color: whitesmoke;
+#msg2 {
+  margin: 15px;
+  border-radius: 0.5rem;
 }
-#msg2{
-    
-    margin: 15px;
-    border-radius: .5rem;
+#msg3 {
+  display: inline-flex;
 }
-#msg3{
-    display: inline-flex;
-    
+#userName {
+  font-size: 20px;
+  font-weight: bold;
 }
-#userName{
-    font-size: 20px;
-    font-weight: bold;
+
+.mainChat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #060606;
+  color: #fff;
+  padding: 20px;
+  border-radius: 2rem;
+}
+
+.msg {
+  width: 100%;
+  overflow-y: auto;
+  padding-bottom: 31px;
+  font-size: 18px;
+}
+.profile-pic {
+  opacity: 0;
+}
+.message-group {
+  border-bottom: solid 1px #ffffff29;
+  margin-bottom: 15px;
+  padding-bottom: 5px;
+}
+.message-group > .message:first-child .profile-pic {
+  opacity: 1;
+}
+
+.message-group > .message:first-child .user-name {
+  display: block;
+}
+.message-group > .message:first-child {
+  padding-top: 2rem;
+}
+.message {
+  display: flex;
+  margin: 5px 0;
+  position: relative;
+}
+.sent {
+  justify-content: flex-end;
+}
+.profile-pic img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.message-content {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+}
+
+.user-name {
+  font-weight: bold;
+  display: none;
+  position: absolute;
+  top: 1px;
+}
+
+.text {
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.timestamp {
+  font-size: 12px;
+  margin-top: 5px;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+.timestamp:hover {
+  opacity: 1;
+}
+
+.sent .text {
+  background-color: #3498db;
+}
+
+.received .text {
+  background-color: #313c3d30;
+  border: solid 1px #ffffff2b;
+}
+
+#send {
+  width: 100%;
+  max-width: 600px;
+}
+button {
+  display: none;
+  padding: 4px;
+  background-color: #ff00002e;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }

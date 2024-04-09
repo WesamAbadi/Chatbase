@@ -1,16 +1,7 @@
-import React, { useId, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { db, auth } from "../firebase";
-import { Button, Input, TextField } from "@material-ui/core";
-import { async } from "@firebase/util";
-import {
-  doc,
-  setDoc,
-  Timestamp,
-  serverTimestamp,
-  addDoc,
-  collection,
-  orderBy,
-} from "firebase/firestore";
+import { Button, TextField } from "@material-ui/core";
+import { serverTimestamp, addDoc, collection } from "firebase/firestore";
 
 function SendMessage() {
   useEffect(() => {
@@ -20,22 +11,12 @@ function SendMessage() {
   async function sendMessage(e) {
     e.preventDefault();
     const { uid, photoURL, displayName } = auth.currentUser;
-
-    /*  await setDoc(doc(db, "messages", "LA"), {
-      text: msg,
-      photoURL,
-      uid,
-      //createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      //createdAt: Timestamp(),
-    }); */
-    //timestamp: serverTimestamp();
     await addDoc(collection(db, "messages"), {
       text: msg,
       photoURL,
       uid,
       displayName,
       createdAt: serverTimestamp(),
-      //Timestamp(date),
     });
 
     setMsg("");

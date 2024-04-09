@@ -1,109 +1,128 @@
 import React, { useState, useEffect } from "react";
 import SignOut from "./SignOut";
+import SendMessage from "./SendMessage";
 import { auth } from "../firebase";
-//import styled from "styled-components";
-
-//import { db } from "../firebase";
 import {
-  doc,
   getDocs,
   getFirestore,
-  onSnapshot,
   collection,
   orderBy,
-  orderByChild,
+  deleteDoc,
+  doc,
 } from "firebase/firestore";
-//import { getDatabase, ref, query, orderByChild } from "firebase/database";
 import "firebase/compat/firestore";
-import SendMessage from "./SendMessage";
-import { FirebaseError } from "firebase/app";
-import userEvent from "@testing-library/user-event";
 
 const db = getFirestore();
 
 function Chat() {
   useEffect(() => {
     startChat();
+    scrollDown();
   }, []);
-  const [messages, setMessages] = useState([]);
-  const [messages2, setMessages2] = useState([]);
-  const array = [];
-  //const [arrays, setArray] = useState([]);
 
-  /* function put(text) {
-    setMessages(text);
-  } */
+  const [messages, setMessages] = useState([]);
   const usrr = auth.currentUser;
 
   function startChat() {
     getDocs(collection(db, "messages"), orderBy("createdAt")).then(
       (querySnapshot) => {
         setMessages(
-          querySnapshot.docs.map(
-            (doc) => ({
-              ...doc.data(),
-            }),
-            orderBy("createdAt.seconds")
-          )
+          querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
         );
-        array.push(
-          querySnapshot.docs.map((doc) => ({
-            ...doc.data(),
-          }))
-        );
-        //console.log("new array is ");
-        //console.log(array);
-
-        //console.log(array.text);
-        /*  newUserDataArray.map((msg) => {
-          setMessages((prevArray) => [...prevArray, msg]);
-          //setArray(msg);
-        }); */
-
-        //console.log(messages);
-        //setMessages(newUserDataArray.map((x)));
-        //newUserDataArray.forEach((element) => setMessages(element.text));
       }
     );
   }
-  messages.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1));
 
-  //console.log(messages);
-  //console.log(usrr);
+  function scrollDown() {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      left: 0,
+      behavior: "smooth",
+    });
+  }
 
-  //  console.log(newUserDataArray);
-  window.scrollTo({
-    top: document.body.scrollHeight,
-    left: 0,
-    behavior: "smooth",
-  });
+  function formatTimestamp(timestampInSeconds) {
+    const date = new Date(timestampInSeconds * 1000);
+    const formattedDate = date.toLocaleDateString();
+    const formattedTime = date.toLocaleTimeString();
+    return `${formattedDate} ${formattedTime}`;
+  }
+
+  async function deleteMessage(messageId) {
+    try {
+      await deleteDoc(doc(db, "messages", messageId));
+      setMessages(messages.filter((msg) => msg.id !== messageId));
+    } catch (error) {
+      console.error("Error deleting message: ", error);
+    }
+  }
+
   return (
     <div className="mainChat">
       <SignOut />
-
       <div className="msg">
-        {messages.map((msg) => (
-          <div
-            key={usrr.uid + Math.random()}
-            id="msg2"
-            style={{
-              backgroundColor: usrr.uid === msg.uid ? "wheat" : "cadetblue",
-              //textAlign: usrr.uid === msg.uid ? "right" : "left",
-            }}
-          >
-            <div id="userName">
-              Sent by {usrr.uid === msg.uid ? "You" : msg.displayName}
-            </div>
-            <div id="msg3">
-              <img src={msg.photoURL} alt="" />
-            </div>
-            <div>{msg.text}</div>
-            <div>{msg.createdAt.seconds}</div>
-          </div>
-        ))}
-      </div>
+        {messages
+          .sort((a, b) => a.createdAt.seconds - b.createdAt.seconds)
+          .reduce((acc, msg, index) => {
+            const prevMsg = messages[index - 1];
+            if (!prevMsg || prevMsg.uid !== msg.uid) {
+              acc.push([]);
+            }
+            acc[acc.length - 1].push(msg);
+            return acc;
+          }, [])
+          .map((messageGroup, groupIndex) => (
+            <div key={groupIndex} className="message-group">
+              {messageGroup.map((msg) => (
+                <div
+                  key={msg.createdAt}
+                  className={`message ${
+                    usrr.uid === msg.uid ? "sent" : "received"
+                  }`}
+                >
+                  <div className="user-name">
+                    {usrr.uid === msg.uid ? "You" : msg.displayName}
+                  </div>
+                  {usrr.uid !== msg.uid && (
+                    <div className="profile-pic">
+                      <img src={msg.photoURL} alt="" />
+                    </div>
+                  )}
 
-      {/* <p>Your chat appears here ..</p> */}
+                  <div className="message-content">
+                    {!groupIndex && (
+                      <div className="user-name">
+                        {usrr.uid === msg.uid ? "You" : msg.displayName}
+                      </div>
+                    )}
+                    {usrr.uid !== msg.uid ? (
+                      <div className="message-content">
+                        {" "}
+                        <div className="text">{msg.text}</div>
+                        <div className="timestamp">
+                          {formatTimestamp(msg.createdAt.seconds)}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="message-content">
+                        <div className="timestamp">
+                          {formatTimestamp(msg.createdAt.seconds)}
+                        </div>
+                        <div className="text">{msg.text}</div>
+                      </div>
+                    )}
+
+                    {usrr.uid === msg.uid && (
+                      <button className="delete" onClick={() => deleteMessage(msg.id)}>
+                        X
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+      </div>
       <div id="send">
         <SendMessage />
       </div>
