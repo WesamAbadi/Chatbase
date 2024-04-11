@@ -17,7 +17,7 @@ const db = getFirestore();
 function Chat() {
   useEffect(() => {
     startChat();
-    scrollDown();
+    // eslint-disable-next-line
   }, []);
 
   const [messages, setMessages] = useState([]);
@@ -31,6 +31,9 @@ function Chat() {
         );
       }
     );
+    setTimeout(() => {
+      scrollDown();
+    }, 600);
   }
 
   function scrollDown() {
@@ -40,6 +43,11 @@ function Chat() {
       behavior: "smooth",
     });
   }
+
+    function addMessage(message) {
+      setMessages((prevMessages) => [...prevMessages, message]);
+      scrollDown();
+    }
 
   function formatTimestamp(timestampInSeconds) {
     const date = new Date(timestampInSeconds * 1000);
@@ -75,7 +83,8 @@ function Chat() {
             <div key={groupIndex} className="message-group">
               {messageGroup.map((msg) => (
                 <div
-                  key={msg.createdAt}
+                  // key={msg.createdAt}
+                  key={msg.id}
                   className={`message ${
                     usrr.uid === msg.uid ? "sent" : "received"
                   }`}
@@ -113,7 +122,10 @@ function Chat() {
                     )}
 
                     {usrr.uid === msg.uid && (
-                      <button className="delete" onClick={() => deleteMessage(msg.id)}>
+                      <button
+                        className="delete"
+                        onClick={() => deleteMessage(msg.id)}
+                      >
                         X
                       </button>
                     )}
@@ -124,7 +136,7 @@ function Chat() {
           ))}
       </div>
       <div id="send">
-        <SendMessage />
+        <SendMessage addMessage={addMessage} />
       </div>
     </div>
   );

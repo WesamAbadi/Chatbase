@@ -3,37 +3,27 @@ import { db, auth } from "../firebase";
 import { Button, TextField } from "@material-ui/core";
 import { serverTimestamp, addDoc, collection } from "firebase/firestore";
 
-function SendMessage() {
-  useEffect(() => {
-    hal();
-  }, []);
+function SendMessage({ addMessage }) {
+  useEffect(() => {}, []);
   const [msg, setMsg] = useState("");
-  async function sendMessage(e) {
-    e.preventDefault();
-    const { uid, photoURL, displayName } = auth.currentUser;
-    await addDoc(collection(db, "messages"), {
-      text: msg,
-      photoURL,
-      uid,
-      displayName,
-      createdAt: serverTimestamp(),
-    });
-
+async function sendMessage(e) {
+  e.preventDefault();
+  const { uid, photoURL, displayName } = auth.currentUser;
+  const messageData = {
+    text: msg,
+    photoURL,
+    uid,
+    displayName,
+    createdAt: serverTimestamp(),
+  };
+  try {
+    const docRef = await addDoc(collection(db, "messages"), messageData);
+    addMessage({ ...messageData, id: docRef.id });
     setMsg("");
-
-    window.scrollTo({
-      top: document.body.scrollHeight,
-      left: 0,
-      behavior: "smooth",
-    });
+  } catch (error) {
+    console.error("Error sending message: ", error);
   }
-  function hal() {
-    window.scrollTo({
-      top: document.body.scrollHeight,
-      left: 0,
-      behavior: "smooth",
-    });
-  }
+}
   return (
     <div>
       <form onSubmit={sendMessage}>
