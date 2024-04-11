@@ -40,8 +40,28 @@ function Chat() {
         const attributeValue = childElement.getAttribute("msg-id");
         deleteMessage(attributeValue);
       }
+    } else if (data.action === "edit") {
+      const childElement = target.querySelector(".text");
+      if (childElement) {
+        const attributeValue = childElement.getAttribute("msg-id");
+        editMessage(attributeValue);
+      }
+    } else if (data.action === "copy") {
+      const childElement = target.querySelector(".text");
+      if (childElement) {
+        const attributeValue = childElement.innerHTML;
+        navigator.clipboard.writeText(attributeValue);
+      }
+    } else if (data.action === "reload") {
+      window.location.reload();
     }
   }
+  const editMessage = (messageId) => {
+    const message = messages.find((msg) => msg.id === messageId);
+    if (message) {
+      console.log("editing");
+    }
+  };
 
   function startChat() {
     getDocs(
@@ -107,90 +127,118 @@ function Chat() {
   }
 
   return (
-    <div className="mainChat">
-      <SignOut />
-      <div className="msg">
-        <button className="load-more" onClick={loadMoreMessages}>
-          Load More
-        </button>
-        {messages
-          .sort((a, b) => a.createdAt.seconds - b.createdAt.seconds)
-          .reduce((acc, msg, index) => {
-            const prevMsg = messages[index - 1];
-            if (!prevMsg || prevMsg.uid !== msg.uid) {
-              acc.push([]);
-            }
-            acc[acc.length - 1].push(msg);
-            return acc;
-          }, [])
-          .map((messageGroup, groupIndex) => (
-            <div key={groupIndex} className="message-group">
-              {messageGroup.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`message ${
-                    usrr.uid === msg.uid ? "sent" : "received"
-                  }`}
-                >
-                  <div className="user-name">
-                    {usrr.uid === msg.uid ? "You" : msg.displayName}
-                  </div>
-                  {usrr.uid !== msg.uid && (
-                    <div className="profile-pic">
-                      <img src={msg.photoURL} alt="" />
+    <ContextMenuTrigger id="Contextmenu">
+      <div className="mainChat">
+        <SignOut />
+        <div className="msg">
+          <button className="load-more" onClick={loadMoreMessages}>
+            Load More
+          </button>
+          {messages
+            .sort((a, b) => a.createdAt.seconds - b.createdAt.seconds)
+            .reduce((acc, msg, index) => {
+              const prevMsg = messages[index - 1];
+              if (!prevMsg || prevMsg.uid !== msg.uid) {
+                acc.push([]);
+              }
+              acc[acc.length - 1].push(msg);
+              return acc;
+            }, [])
+            .map((messageGroup, groupIndex) => (
+              <div key={groupIndex} className="message-group">
+                {messageGroup.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`message ${
+                      usrr.uid === msg.uid ? "sent" : "received"
+                    }`}
+                  >
+                    <div className="user-name">
+                      {usrr.uid === msg.uid ? "You" : msg.displayName}
                     </div>
-                  )}
-
-                  <div className="message-content">
-                    {!groupIndex && (
-                      <div className="user-name">
-                        {usrr.uid === msg.uid ? "You" : msg.displayName}
+                    {usrr.uid !== msg.uid && (
+                      <div className="profile-pic">
+                        <img src={msg.photoURL} alt="" />
                       </div>
                     )}
-                    {usrr.uid !== msg.uid ? (
-                      <div className="message-content">
-                        {" "}
-                        <div className="text">{msg.text}</div>
-                        <div className="timestamp">
-                          {formatTimestamp(msg.createdAt.seconds)}
+
+                    <div className="message-content">
+                      {!groupIndex && (
+                        <div className="user-name">
+                          {usrr.uid === msg.uid ? "You" : msg.displayName}
                         </div>
-                      </div>
-                    ) : (
-                      <div className="message-content">
-                        <div className="timestamp">
-                          {formatTimestamp(msg.createdAt.seconds)}
-                        </div>
-                        <ContextMenuTrigger id="Contextmenu">
-                          <div className="text" msg-id={msg.id}>
-                            {msg.text}
+                      )}
+                      {usrr.uid !== msg.uid ? (
+                        <ContextMenuTrigger id="Contextmenu3" name={msg.id}> 
+                          <div className="message-content">
+                            <div className="text">{msg.text}</div>
+                            <div className="timestamp">
+                              {formatTimestamp(msg.createdAt.seconds)}
+                            </div>
                           </div>
                         </ContextMenuTrigger>
-                      </div>
-                    )}
+                      ) : (
+                        <div className="message-content">
+                          <div className="timestamp">
+                            {formatTimestamp(msg.createdAt.seconds)}
+                          </div>
 
-                    {usrr.uid === msg.uid && (
-                      <button
-                        className="delete hidden"
-                        onClick={() => deleteMessage(msg.id)}
-                      >
-                        X
-                      </button>
-                    )}
+                          <ContextMenuTrigger id="Contextmenu2">
+                            <div className="text" msg-id={msg.id}>
+                              {msg.text}
+                            </div>
+                          </ContextMenuTrigger>
+                        </div>
+                      )}
+
+                      {usrr.uid === msg.uid && (
+                        <button
+                          className="delete hidden"
+                          onClick={() => deleteMessage(msg.id)}
+                        >
+                          X
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ))}
+                ))}
+              </div>
+            ))}
+        </div>
+
+        <div id="send">
+          <SendMessage addMessage={addMessage} />
+        </div>
+        <ContextMenu id="Contextmenu">
+          <MenuItem data={{ action: "reload" }} onClick={handleClick}>
+            reload
+          </MenuItem>
+        </ContextMenu>
+        <ContextMenu id="Contextmenu2">
+          <MenuItem data={{ action: "copy" }} onClick={handleClick}>
+            Copy
+          </MenuItem>
+          <MenuItem disabled data={{ action: "edit" }} onClick={handleClick}>
+            Edit
+          </MenuItem>
+          <MenuItem data={{ action: "delete" }} onClick={handleClick}>
+            Delete Message
+          </MenuItem>
+          <MenuItem></MenuItem>
+        </ContextMenu>
+        <ContextMenu
+          id="Contextmenu3"
+          onShow={() => console.log("Show")}
+        >
+          <MenuItem disabled data={{ action: "report" }} onClick={handleClick}>
+            Report
+          </MenuItem>
+          <MenuItem disabled data={{ action: "view" }} onClick={handleClick}>
+            View Profile
+          </MenuItem>
+        </ContextMenu>
       </div>
-      <div id="send">
-        <SendMessage addMessage={addMessage} />
-      </div>
-      <ContextMenu id="Contextmenu">
-        <MenuItem data={{ action: "delete" }} onClick={handleClick}>
-          Delete Message
-        </MenuItem>
-      </ContextMenu>
-    </div>
+    </ContextMenuTrigger>
   );
 }
 
