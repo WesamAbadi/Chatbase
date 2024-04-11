@@ -8,9 +8,24 @@ function SendMessage({ addMessage }) {
   const [msg, setMsg] = useState("");
 async function sendMessage(e) {
   e.preventDefault();
+  // Trim the message to remove leading and trailing whitespace
+  const trimmedMessage = msg.trim();
+
+  // Check if the message is empty or exceeds a certain length
+  if (trimmedMessage === "") {
+    // Display an error message or prevent sending
+    console.error("Error: Message cannot be empty");
+    return;
+  }
+  if (trimmedMessage.length > 1000) {
+    // Display an error message or prevent sending
+    console.error("Error: Message exceeds 1000 characters");
+    return;
+  }
+
   const { uid, photoURL, displayName } = auth.currentUser;
   const messageData = {
-    text: msg,
+    text: trimmedMessage,
     photoURL,
     uid,
     displayName,
@@ -24,6 +39,7 @@ async function sendMessage(e) {
     console.error("Error sending message: ", error);
   }
 }
+
   return (
     <div>
       <form onSubmit={sendMessage}>

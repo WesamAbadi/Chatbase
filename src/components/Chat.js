@@ -4,14 +4,23 @@ import SendMessage from "./SendMessage";
 import { auth } from "../firebase";
 import {
   getDocs,
+  query,
   getFirestore,
   collection,
   orderBy,
   deleteDoc,
   doc,
+  startAfter,
+  limit,
 } from "firebase/firestore";
 import "firebase/compat/firestore";
 
+import {
+  ContextMenu,
+  MenuItem,
+  ContextMenuTrigger,
+} from "@firefox-devtools/react-contextmenu";
+import "../Contextmenu.css";
 const db = getFirestore();
 
 function Chat() {
@@ -21,19 +30,51 @@ function Chat() {
   }, []);
 
   const [messages, setMessages] = useState([]);
+  const [lastVisible, setLastVisible] = useState(null);
   const usrr = auth.currentUser;
 
-  function startChat() {
-    getDocs(collection(db, "messages"), orderBy("createdAt")).then(
-      (querySnapshot) => {
-        setMessages(
-          querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-        );
+  function handleClick(e, data, target) {
+    if (data.action === "delete") {
+      const childElement = target.querySelector(".text");
+      if (childElement) {
+        const attributeValue = childElement.getAttribute("msg-id");
+        deleteMessage(attributeValue);
       }
-    );
+    }
+  }
+
+  function startChat() {
+    getDocs(
+      query(collection(db, "messages"), orderBy("createdAt", "desc"), limit(20))
+    ).then((querySnapshot) => {
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        data.push({ ...doc.data(), id: doc.id });
+      });
+      setMessages(data.reverse());
+      setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+    });
     setTimeout(() => {
       scrollDown();
     }, 600);
+  }
+
+  function loadMoreMessages() {
+    getDocs(
+      query(
+        collection(db, "messages"),
+        orderBy("createdAt", "desc"),
+        startAfter(lastVisible),
+        limit(20)
+      )
+    ).then((querySnapshot) => {
+      const data = [];
+      querySnapshot.forEach((doc) => {
+        data.push({ ...doc.data(), id: doc.id });
+      });
+      setMessages((prevMessages) => [...prevMessages, ...data.reverse()]);
+      setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+    });
   }
 
   function scrollDown() {
@@ -44,10 +85,10 @@ function Chat() {
     });
   }
 
-    function addMessage(message) {
-      setMessages((prevMessages) => [...prevMessages, message]);
-      scrollDown();
-    }
+  function addMessage(message) {
+    setMessages((prevMessages) => [...prevMessages, message]);
+    scrollDown();
+  }
 
   function formatTimestamp(timestampInSeconds) {
     const date = new Date(timestampInSeconds * 1000);
@@ -69,6 +110,9 @@ function Chat() {
     <div className="mainChat">
       <SignOut />
       <div className="msg">
+        <button className="load-more" onClick={loadMoreMessages}>
+          Load More
+        </button>
         {messages
           .sort((a, b) => a.createdAt.seconds - b.createdAt.seconds)
           .reduce((acc, msg, index) => {
@@ -83,7 +127,6 @@ function Chat() {
             <div key={groupIndex} className="message-group">
               {messageGroup.map((msg) => (
                 <div
-                  // key={msg.createdAt}
                   key={msg.id}
                   className={`message ${
                     usrr.uid === msg.uid ? "sent" : "received"
@@ -117,13 +160,17 @@ function Chat() {
                         <div className="timestamp">
                           {formatTimestamp(msg.createdAt.seconds)}
                         </div>
-                        <div className="text">{msg.text}</div>
+                        <ContextMenuTrigger id="Contextmenu">
+                          <div className="text" msg-id={msg.id}>
+                            {msg.text}
+                          </div>
+                        </ContextMenuTrigger>
                       </div>
                     )}
 
                     {usrr.uid === msg.uid && (
                       <button
-                        className="delete"
+                        className="delete hidden"
                         onClick={() => deleteMessage(msg.id)}
                       >
                         X
@@ -138,6 +185,11 @@ function Chat() {
       <div id="send">
         <SendMessage addMessage={addMessage} />
       </div>
+      <ContextMenu id="Contextmenu">
+        <MenuItem data={{ action: "delete" }} onClick={handleClick}>
+          Delete Message
+        </MenuItem>
+      </ContextMenu>
     </div>
   );
 }

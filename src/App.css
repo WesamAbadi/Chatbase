@@ -132,12 +132,30 @@ body {
   width: 100%;
   max-width: 600px;
 }
-button {
+.hidden {
   display: none;
   padding: 4px;
   background-color: #ff00002e;
   color: white;
-  border: none;
+}
+.delete{
+  background-color: black;
+color:  red;
+}
+
+button {
   border-radius: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 13px;
+  margin: 10px;
   cursor: pointer;
+}
+.load-more {
+  background-color: black;
+  border: solid rgba(255, 255, 255, 0.521) 1px;
+  color: white;
+  padding: 10px 20px;
+  transition: background-color 0.3s;
 }
