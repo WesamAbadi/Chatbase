@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import SignOut from "./SignOut";
 import SendMessage from "./SendMessage";
 import { auth } from "../firebase";
 import {
@@ -32,6 +31,7 @@ function Chat() {
   const [messages, setMessages] = useState([]);
   const [lastVisible, setLastVisible] = useState(null);
   const usrr = auth.currentUser;
+  console.log(usrr);
 
   function handleClick(e, data, target) {
     if (data.action === "delete") {
@@ -129,7 +129,6 @@ function Chat() {
   return (
     <ContextMenuTrigger id="Contextmenu">
       <div className="mainChat">
-        <SignOut />
         <div className="msg">
           <button className="load-more" onClick={loadMoreMessages}>
             Load More
@@ -155,6 +154,9 @@ function Chat() {
                   >
                     <div className="user-name">
                       {usrr.uid === msg.uid ? "You" : msg.displayName}
+                      {msg.uid === "vLvzk4bWknVTHe0cUb6XuO1o9ZW2" && (
+                        <div className="badge badge-primary">Admin</div>
+                      )}
                     </div>
                     {usrr.uid !== msg.uid && (
                       <div className="profile-pic">
@@ -169,7 +171,7 @@ function Chat() {
                         </div>
                       )}
                       {usrr.uid !== msg.uid ? (
-                        <ContextMenuTrigger id="Contextmenu3" name={msg.id}> 
+                        <ContextMenuTrigger id="Contextmenu3" name={msg.id}>
                           <div className="message-content">
                             <div className="text">{msg.text}</div>
                             <div className="timestamp">
@@ -226,10 +228,7 @@ function Chat() {
           </MenuItem>
           <MenuItem></MenuItem>
         </ContextMenu>
-        <ContextMenu
-          id="Contextmenu3"
-          onShow={() => console.log("Show")}
-        >
+        <ContextMenu id="Contextmenu3" onShow={() => console.log("Show")}>
           <MenuItem disabled data={{ action: "report" }} onClick={handleClick}>
             Report
           </MenuItem>
