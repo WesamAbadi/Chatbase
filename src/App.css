@@ -152,6 +152,10 @@ body {
   width: 100%;
   max-width: 600px;
 }
+#send p {
+  color: #141414;
+  font-size: 20px;
+}
 .hidden {
   display: none;
   padding: 4px;

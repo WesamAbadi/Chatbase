@@ -31,7 +31,7 @@ function Chat() {
   const [messages, setMessages] = useState([]);
   const [lastVisible, setLastVisible] = useState(null);
   const usrr = auth.currentUser;
-  console.log(usrr);
+  // console.log(usrr);
 
   function handleClick(e, data, target) {
     if (data.action === "delete") {
@@ -59,7 +59,7 @@ function Chat() {
   const editMessage = (messageId) => {
     const message = messages.find((msg) => msg.id === messageId);
     if (message) {
-      console.log("editing");
+      // console.log("editing");
     }
   };
 
@@ -209,7 +209,7 @@ function Chat() {
         </div>
 
         <div id="send">
-          <SendMessage addMessage={addMessage} />
+          <SendMessage addMessage={addMessage} anonymous={usrr.isAnonymous} />
         </div>
         <ContextMenu id="Contextmenu">
           <MenuItem data={{ action: "reload" }} onClick={handleClick}>
