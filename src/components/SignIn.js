@@ -26,12 +26,17 @@ function SignIn() {
       <div className="signin-content">
         <h1 className="signin-title">Welcome to Chatbase!</h1>
         <p className="signin-subtitle">Sign in to start chatting</p>
-        <button onClick={signInWithGoogle} className="btn btn-wide btn-outline">
-          Sign in with Google
-        </button>
-        <button onClick={signInAsGuest} className="btn btn-wide btn-outline">
-          View as Guest
-        </button>
+        <div className="signin-buttons">
+          <button
+            onClick={signInWithGoogle}
+            className="btn btn-wide btn-outline"
+          >
+            Sign in with Google
+          </button>
+          <button onClick={signInAsGuest} className="btn btn-wide btn-outline">
+            View as Guest
+          </button>
+        </div>
       </div>
     </div>
   );

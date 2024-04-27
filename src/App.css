@@ -224,3 +224,8 @@ button {
 .signin-button:hover {
   background-color: #357ae8;
 }
+.signin-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
